@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>智活人才库 · HR人才库智能管理与激活平台</title>
+<style>
+:root{
+  --bg:#f5f4f1;--sf:#ffffff;--sf2:#fbfaf8;
+  --ink:#191a1c;--mut:#70747c;--faint:#9a9ea6;
+  --line:#e7e5e0;--line2:#f0efeb;
+  --acc:#0f766e;--acc2:#0b5a54;--accbg:#e7f3f0;--accline:#bfe0da;
+  --gold:#96660a;--goldbg:#fbf0d3;--goldline:#ecd9a0;
+  --red:#b42318;--redbg:#fdecea;
+  --blue:#175cd3;--bluebg:#eaf1fd;
+  --vio:#6941c6;--viobg:#f2edfb;
+  --grn:#067647;--grnbg:#e7f4ec;
+  --sh:0 1px 2px rgba(22,22,28,.04),0 10px 28px rgba(22,22,28,.07);
+  --r:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:13px}
+.num{font-variant-numeric:tabular-nums}
+.app{display:flex;height:100vh;overflow:hidden}
+/* ---------- sidebar ---------- */
+.sidebar{width:220px;flex:none;background:var(--sf);border-right:1px solid var(--line);display:flex;flex-direction:column}
+.brand{padding:20px 18px 16px;border-bottom:1px solid var(--line2)}
+.brand .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#0f766e,#134e4a);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;box-shadow:0 4px 10px rgba(15,118,110,.28)}
+.brand .bt{display:flex;align-items:center;gap:10px}
+.brand .nm{font-weight:700;font-size:15.5px;letter-spacing:.5px}
+.brand .sub{font-size:11px;color:var(--mut);margin-top:1px;letter-spacing:.3px}
+.nav{flex:1;padding:12px 10px;overflow:auto}
+.nav .cap{font-size:11px;color:var(--faint);padding:10px 10px 6px;letter-spacing:1px}
+.nitem{display:flex;align-items:center;gap:10px;width:100%;padding:9px 11px;border:0;background:none;border-radius:9px;color:#3d4046;font-size:13.5px;margin-bottom:2px;text-align:left;transition:background .15s}
+.nitem:hover{background:var(--line2)}
+.nitem.on{background:var(--accbg);color:var(--acc2);font-weight:600}
+.nitem svg{width:17px;height:17px;flex:none;opacity:.85}
+.nitem .nbdg{margin-left:auto;background:var(--red);color:#fff;font-size:10.5px;border-radius:8px;padding:0 6px;line-height:16px;min-width:16px;text-align:center}
+.nitem .nbdg.soft{background:var(--goldbg);color:var(--gold)}
+.sidefoot{padding:14px 16px;border-top:1px solid var(--line2);font-size:11.5px;color:var(--mut)}
+.syncdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#12b76a;margin-right:6px;animation:pulse 2s infinite}
+.syncdot.warn{background:#f79009;animation:none}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(18,183,106,.4)}70%{box-shadow:0 0 0 6px rgba(18,183,106,0)}100%{box-shadow:0 0 0 0 rgba(18,183,106,0)}}
+/* ---------- main ---------- */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:58px;flex:none;background:var(--sf);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 24px;gap:16px}
+.ttl{font-size:16px;font-weight:700}
+.ttl small{display:block;font-size:11.5px;font-weight:400;color:var(--mut);margin-top:-1px}
+.tspace{flex:1}
+.iconbtn{position:relative;width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--sf);display:flex;align-items:center;justify-content:center;color:#4a4e55}
+.iconbtn:hover{background:var(--line2)}
+.iconbtn svg{width:17px;height:17px}
+.bdg{position:absolute;top:-5px;right:-5px;background:var(--red);color:#fff;font-size:10px;min-width:16px;line-height:16px;border-radius:8px;padding:0 4px;text-align:center}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#134e4a,#0f766e);color:#fff;font-size:12.5px;display:flex;align-items:center;justify-content:center;font-weight:600}
+.viewwrap{flex:1;overflow:auto;padding:22px 24px 40px}
+.view{max-width:1180px;margin:0 auto;animation:vin .3s ease}
+@keyframes vin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* ---------- generic ---------- */
+.panel{background:var(--sf);border:1px solid var(--line);border-radius:var(--r)}
+.ph{padding:14px 18px;border-bottom:1px solid var(--line2);display:flex;align-items:center;gap:10px}
+.ph .t{font-weight:700;font-size:14px}
+.ph .d{font-size:12px;color:var(--mut)}
+.ph .sp{flex:1}
+.pb{padding:16px 18px}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:9px;border:1px solid var(--line);background:var(--sf);padding:7px 14px;font-size:13px;color:var(--ink);transition:.15s}
+.btn:hover{border-color:#d5d2cb;background:var(--sf2)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+.btn.pri:hover{background:var(--acc2)}
+.btn.pri:disabled{opacity:.55;cursor:not-allowed}
+.btn.sm{padding:4px 10px;font-size:12px;border-radius:7px}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--acc2)}
+.btn.ghost:hover{background:var(--accbg)}
+.btn.danger{color:var(--red);border-color:#f3c6c2}
+.btn.danger:hover{background:var(--redbg)}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:2px 9px;border-radius:999px;border:1px solid var(--line);background:var(--sf2);color:#4a4e55;white-space:nowrap}
+.chip .dot{width:6px;height:6px;border-radius:50%}
+.chip.acc{background:var(--accbg);color:var(--acc2);border-color:var(--accline)}
+.chip.gold{background:var(--goldbg);color:var(--gold);border-color:var(--goldline)}
+.chip.red{background:var(--redbg);color:var(--red);border-color:#f3c6c2}
+.chip.blue{background:var(--bluebg);color:var(--blue);border-color:#c8dbf7}
+.chip.grn{background:var(--grnbg);color:var(--grn);border-color:#bfe3cd}
+.chip.vio{background:var(--viobg);color:var(--vio);border-color:#ded0f5}
+.chip.gray{background:#f2f1ee;color:#6b6f76}
+.chip.click{cursor:pointer;user-select:none}
+.chip.click:hover{border-color:#c9c6bf}
+.chip.on{background:var(--accbg);color:var(--acc2);border-color:var(--accline);font-weight:600}
+.chip.off{opacity:.5;text-decoration:line-through}
+.tag{display:inline-flex;align-items:center;font-size:11px;padding:1.5px 8px;border-radius:6px;background:var(--line2);color:#5a5e66;margin-right:4px;white-space:nowrap}
+.tag.hit{background:var(--accbg);color:var(--acc2);font-weight:600}
+.tag.add{background:var(--grnbg);color:var(--grn)}
+.tag.del{background:var(--redbg);color:var(--red);text-decoration:line-through}
+.scene-校招{color:#0e7490}.scene-社招{color:#0f766e}.scene-实习{color:#b45309}
+.d-校招{background:#0e7490}.d-社招{background:#0f766e}.d-实习{background:#b45309}
+.hp-高潜{background:var(--goldbg);color:var(--gold);border:1px solid var(--goldline)}
+.hp-优质{background:var(--accbg);color:var(--acc2);border:1px solid var(--accline)}
+.hp-普通{background:#f2f1ee;color:#8a8e96;border:1px solid var(--line)}
+.src-过往筛除{background:var(--redbg);color:var(--red)}
+.src-往期面试{background:var(--bluebg);color:var(--blue)}
+.src-储备人才{background:var(--grnbg);color:var(--grn)}
+.src-新投递{background:var(--viobg);color:var(--vio)}
+/* stats strip */
+.strip{display:flex;background:var(--sf);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.stat{flex:1;padding:18px 20px;position:relative}
+.stat+.stat{border-left:1px solid var(--line2)}
+.stat .k{font-size:12px;color:var(--mut)}
+.stat .v{font-size:26px;font-weight:700;margin-top:2px;letter-spacing:-.5px}
+.stat .v small{font-size:12px;color:var(--mut);font-weight:400;margin-left:4px}
+.stat .s{font-size:11.5px;color:var(--faint);margin-top:2px}
+.stat .ico{position:absolute;right:16px;top:16px;color:#c9c6bf}
+.stat .ico svg{width:18px;height:18px}
+/* alerts */
+.alerts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.abtn{font-size:12px;color:var(--acc2);background:none;border:0;font-weight:600;white-space:nowrap}
+.abtn:hover{text-decoration:underline}
+.alist .arow{display:flex;align-items:center;gap:10px;padding:10px 18px;border-top:1px solid var(--line2)}
+.alist .arow:first-child{border-top:0}
+.arow .tx{flex:1;min-width:0}
+.arow .tx .l1{font-size:13px;font-weight:600}
+.arow .tx .l2{font-size:11.5px;color:var(--mut)}
+/* rows list */
+.rows{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:12px;padding:11px 18px;border-top:1px solid var(--line2);cursor:pointer;transition:background .12s;position:relative}
+.row:first-child{border-top:0}
+.row:hover{background:#f8f7f4}
+.row .avt{width:34px;height:34px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;color:#fff}
+.row .mi{flex:1;min-width:0}
+.row .l1{display:flex;align-items:center;gap:7px;font-weight:600;font-size:13.5px}
+.row .l1 .nm{white-space:nowrap}
+.row .l2{font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.row .rt{flex:none;text-align:right}
+.ring{width:36px;height:36px}
+.ring-bg{fill:none;stroke:var(--line2);stroke-width:4}
+.ring-fg{fill:none;stroke:var(--acc);stroke-width:4;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%}
+.ring-t{font-size:10.5px;font-weight:700;fill:var(--ink)}
+.ring.low .ring-fg{stroke:#f79009}
+.rank{font-size:10.5px;font-weight:700;color:var(--gold);background:var(--goldbg);border:1px solid var(--goldline);border-radius:6px;padding:0 5px;line-height:16px}
+.his{border-top:1px dashed var(--line);background:var(--sf2);padding:10px 18px 12px 64px;margin-top:-1px}
+.his .hl{font-size:12px;color:var(--mut);padding:2px 0;display:flex;gap:10px}
+.his .hl b{color:#4a4e55;font-weight:600;min-width:76px}
+/* matching */
+.mgrid{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start}
+.jrow{padding:11px 14px;border-top:1px solid var(--line2);cursor:pointer;transition:background .12s}
+.jrow:first-child{border-top:0}
+.jrow:hover{background:#f8f7f4}
+.jrow.on{background:var(--accbg);box-shadow:inset 3px 0 0 var(--acc)}
+.jrow .l1{display:flex;align-items:center;gap:7px;font-weight:600;font-size:13px}
+.jrow .l2{font-size:11.5px;color:var(--mut);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap}
+.wctl{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.wctl label{width:88px;font-size:12.5px;color:#4a4e55;flex:none}
+.wctl input[type=range]{flex:1;accent-color:var(--acc);height:4px}
+.wctl .wv{width:34px;text-align:right;font-weight:700;font-size:12.5px;color:var(--acc2)}
+.engine{background:var(--sf2);border:1px dashed #d5d2cb;border-radius:10px;padding:14px 16px;margin-top:14px}
+.estep{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:12.5px;color:var(--mut)}
+.estep .st{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line);flex:none;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--faint)}
+.estep.act{color:var(--ink);font-weight:600}
+.estep.act .st{border-color:var(--acc);color:var(--acc);animation:spin 1s linear infinite}
+.estep.done{color:#4a4e55}
+.estep.done .st{background:var(--acc);border-color:var(--acc);color:#fff;animation:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pbar{height:5px;border-radius:3px;background:var(--line2);overflow:hidden;margin:10px 0 2px}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),#14b8a6);border-radius:3px;transition:width .5s ease;width:0}
+.grp-h{display:flex;align-items:center;gap:8px;margin:18px 0 8px;font-weight:700;font-size:13px}
+.grp-h .n{font-size:11px;color:var(--mut);font-weight:400}
+/* review */
+.duecard{display:flex;align-items:center;gap:12px;padding:13px 18px;border-top:1px solid var(--line2);cursor:pointer}
+.duecard:hover{background:#f8f7f4}
+.duecard.on{background:var(--accbg);box-shadow:inset 3px 0 0 var(--acc)}
+.funnel{display:flex;align-items:stretch;gap:0;background:var(--sf2);border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+.fseg{flex:1;padding:12px 16px;position:relative}
+.fseg+.fseg{border-left:1px solid var(--line2)}
+.fseg .k{font-size:11.5px;color:var(--mut)}
+.fseg .v{font-size:21px;font-weight:700}
+.fseg .r{font-size:11px;margin-top:1px}
+.r.up{color:var(--grn)}.r.down{color:var(--red)}.r.flat{color:var(--mut)}
+.bar{margin-bottom:10px}
+.bar .bl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.bar .bl b{font-weight:600}
+.bar .tr{height:8px;background:var(--line2);border-radius:4px;position:relative}
+.bar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--acc);border-radius:4px}
+.bar .tr em{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--gold);border-radius:1px}
+.bar .bl .mk{color:var(--gold);font-size:11px}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.timeline{position:relative;padding-left:20px;margin-top:6px}
+.timeline:before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--line2)}
+.tli{position:relative;padding:4px 0 10px;font-size:12.5px}
+.tli:before{content:"";position:absolute;left:-19px;top:9px;width:10px;height:10px;border-radius:50%;background:var(--sf);border:2.5px solid var(--acc)}
+.tli .td{color:var(--faint);font-size:11px;margin-right:8px}
+.diffbox{border:1px solid var(--line2);background:var(--sf2);border-radius:10px;padding:12px 14px}
+.diffbox .cap{font-size:11.5px;color:var(--mut);margin-bottom:6px}
+/* pool */
+.poolgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.poolc{background:var(--sf);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden}
+.poolc .pn{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
+.poolc .pv{font-size:30px;font-weight:700;letter-spacing:-1px;margin-top:6px}
+.poolc .pv small{font-size:12px;font-weight:400;color:var(--mut);letter-spacing:0}
+.poolc .pd{font-size:11.5px;color:var(--mut);margin-top:2px}
+.poolc .glyph{position:absolute;right:-6px;bottom:-14px;font-size:64px;font-weight:800;color:var(--line2);line-height:1;user-select:none}
+.cycle{position:relative;height:2px;background:var(--line);margin:14px 6px 8px}
+.cycle .node{position:absolute;top:-5px;width:12px;height:12px;border-radius:50%;background:var(--sf);border:3px solid var(--acc)}
+.cycle .node.future{border-color:var(--gold);background:var(--goldbg)}
+.cycle .nl{position:absolute;top:12px;font-size:11px;color:var(--mut);white-space:nowrap;transform:translateX(-50%)}
+.migrate-flash{animation:flash 1.2s ease}
+@keyframes flash{0%{background:var(--goldbg)}100%{background:transparent}}
+.filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.srch{flex:1;max-width:260px;border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:13px;background:var(--sf);outline:none}
+.srch:focus{border-color:var(--acc)}
+/* bio card */
+#bioCard{position:fixed;z-index:90;width:372px;background:var(--sf);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 50px rgba(20,20,30,.16);padding:16px 18px;opacity:0;pointer-events:none;transform:translateY(6px);transition:opacity .18s,transform .18s}
+#bioCard.show{opacity:1;pointer-events:auto;transform:none}
+#bioCard .bh{display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--line2)}
+#bioCard .bname{font-size:15px;font-weight:700}
+#bioCard .bsub{font-size:11.5px;color:var(--mut)}
+.bsec{margin-top:10px}
+.bsec .bc{font-size:10.5px;color:var(--faint);letter-spacing:1px;margin-bottom:4px}
+.bsec .bv{font-size:12.5px;color:#33363c}
+.bquote{background:var(--sf2);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:7px 10px;font-size:12px;color:#4a4e55}
+.bfoot{margin-top:12px;padding-top:9px;border-top:1px dashed var(--line);font-size:11px;color:var(--faint);display:flex;justify-content:space-between;align-items:center}
+/* modal */
+#modalRoot{position:fixed;inset:0;z-index:100;display:none}
+#modalRoot.show{display:block}
+.overlay{position:absolute;inset:0;background:rgba(24,26,30,.4);backdrop-filter:blur(2px);animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.modal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:600px;max-width:94vw;max-height:86vh;overflow:auto;background:var(--sf);border-radius:16px;box-shadow:0 24px 70px rgba(10,12,16,.3);animation:pop .22s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes pop{from{opacity:0;transform:translate(-50%,-46%) scale(.97)}}
+.mh{padding:16px 22px;border-bottom:1px solid var(--line2);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--sf);z-index:2}
+.mh .t{font-weight:700;font-size:15px}
+.mh .sp{flex:1}
+.mx{border:0;background:none;width:28px;height:28px;border-radius:8px;color:var(--mut);font-size:16px}
+.mx:hover{background:var(--line2)}
+.mb{padding:18px 22px 22px}
+.msec{margin-bottom:16px}
+.msec .cap{font-size:11px;color:var(--faint);letter-spacing:1px;margin-bottom:7px;font-weight:700}
+.kv{display:grid;grid-template-columns:96px 1fr;gap:6px 10px;font-size:13px}
+.kv .k{color:var(--mut)}
+.evrow{padding:9px 0;border-top:1px dashed var(--line2);font-size:12.5px}
+.evrow:first-of-type{border-top:0}
+.evrow .eq{color:#33363c;margin:2px 0}
+.evrow .em{font-size:11px;color:var(--faint)}
+/* toast */
+#toastRoot{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{background:#1d1f23;color:#f4f4f2;font-size:13px;padding:10px 18px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);display:flex;gap:8px;align-items:center;animation:tin .25s ease}
+.toast .tdot{width:7px;height:7px;border-radius:50%;background:#12b76a}
+.toast.warn .tdot{background:#f79009}
+@keyframes tin{from{opacity:0;transform:translateY(10px)}}
+/* bell panel */
+#bellPanel{position:absolute;top:52px;right:20px;width:360px;background:var(--sf);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);z-index:80;display:none;overflow:hidden}
+#bellPanel.show{display:block;animation:pop2 .18s ease}
+@keyframes pop2{from{opacity:0;transform:translateY(-6px)}}
+.note{font-size:12px;color:var(--mut);background:var(--sf2);border:1px dashed #d9d6cf;border-radius:9px;padding:8px 12px}
+.empty{padding:28px;text-align:center;color:var(--faint);font-size:12.5px}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:#d9d6cf;border-radius:5px;border:2px solid var(--bg)}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="bt"><div class="mark">智</div>
+        <div><div class="nm">智活人才库</div><div class="sub">TalentPulse · 智能管理与激活</div></div>
+      </div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sidefoot">
+      <div><span class="syncdot"></span>已对接原HR招聘系统 · 同步正常</div>
+      <div style="margin-top:4px;color:var(--faint)">独立模块部署 · 无缝读写岗位/简历/面试数据</div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div class="ttl" id="pageTitle">工作台</div>
+      <div class="tspace"></div>
+      <button class="iconbtn" data-action="bell" title="提醒中心">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        <span class="bdg" id="bellCount" style="display:none"></span>
+      </button>
+      <div class="avatar">HR</div>
+      <div id="bellPanel"></div>
+    </header>
+    <div class="viewwrap"><div class="view" id="viewRoot"></div></div>
+  </div>
+</div>
+<div id="bioCard"></div>
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+
+<script>
+'use strict';
+/* ================= utils ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const fmt=n=>Number(n).toLocaleString('en-US');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const byId=(arr,id)=>arr.find(x=>x.id===id);
+const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const daysAgo=ds=>{if(!ds)return 999;return Math.max(0,Math.floor((Date.now()-new Date(ds+'T00:00:00'))/864e5))};
+const AVA=['#0f766e','#175cd3','#b45309','#6941c6','#b42318','#475467','#0e7490'];
+const avColor=id=>AVA[[...id].reduce((a,c)=>a+c.charCodeAt(0),0)%AVA.length];
+function toast(msg,warn){const t=document.createElement('div');t.className='toast'+(warn?' warn':'');t.innerHTML='<span class="tdot"></span>'+esc(msg);$('#toastRoot').appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),320)},2600)}
+function ring(p){const r=15.5,c=2*Math.PI*r,off=c*(1-p/100);return '<svg class="ring'+(p<60?' low':'')+'" viewBox="0 0 40 40"><circle class="ring-bg" cx="20" cy="20" r="'+r+'"/><circle class="ring-fg" cx="20" cy="20" r="'+r+'" stroke-dasharray="'+c.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'"/><text class="ring-t num" x="20" y="24" text-anchor="middle">'+p+'</text></svg>'}
+const ICON={
+ grid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>',
+ target:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>',
+ loop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-2.6-6.3"/><path d="M21 3v6h-6"/></svg>',
+ flame:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4.4 0 7.5-3 7.5-7.2 0-3.6-2.3-6-4.2-8.1C13.6 5 13 3.4 13 2c-3 2-4.6 4.7-4.6 7 0 0-1.6-1-2.1-3C4.7 7.7 4.5 10.6 4.5 12c0 5 3.1 10 7.5 10z"/></svg>',
+ db:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>',
+ file:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>',
+ up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17L17 7M9 7h8v8"/></svg>'
+};
+/* ================= data ================= */
+const SCENE={campus:'校招',society:'社招',intern:'实习'};
+const POOL={campus:'校招人才库',society:'社招人才库',intern:'实习人才库'};
+function C(o){return Object.assign({bioExtra:'',flags:[],industries:[],evals:[],history:[],strengths:[],weaknesses:[],adapt:[],appliedJob:null,migrateFrom:null,gpa:'',campus:null,company:'',title:''},o)}
+const candidates=[
+/* ---- 社招人才库 ---- */
+C({id:'c01',name:'林晚晴',scene:'society',source:'往期面试',years:5,edu:'硕士 · 复旦大学 · 计算机技术',eduTier:3,company:'某金融科技公司',title:'高级前端工程师',industries:['互联网/电商','互联网金融'],skills:['React','TypeScript','性能优化','微前端','Node.js'],flags:['高并发交易系统经验','主导过组件库建设'],hp:'高潜',hpScene:'社招高潜',lastTouch:'2026-07-02',status:'保温中',strengths:['架构思维出色','能独立主导复杂模块','性能调优经验丰富'],weaknesses:['管理经验尚浅'],adapt:['高级前端工程师','前端架构师'],evals:[['高级前端工程师','2026-05-28','终面通过','架构思维出色，主导过支付前端重构，高并发场景处理经验扎实','王工']],history:[['2026-05-20','高级前端工程师','初筛通过'],['2026-05-28','高级前端工程师','终面通过 · HC被占用'],['2026-06-02','高级前端工程师','转入高潜储备池']]}),
+C({id:'c02',name:'苏黎',scene:'society',source:'储备人才',years:6,edu:'本科 · 浙江大学 · 计算机科学与技术',eduTier:2,company:'某头部互联网公司',title:'资深前端工程师',industries:['互联网/电商'],skills:['React','Node.js','GraphQL','性能优化','K8s'],flags:['高并发交易系统经验','主导过组件库建设'],hp:'优质',hpScene:'社招高潜',lastTouch:'2026-05-30',status:'保温中',strengths:['全栈能力','大促页面稳定性保障经验'],weaknesses:['近期活跃度下降'],adapt:['高级前端工程师','前端架构师'],history:[['2026-03-11','高级前端工程师','HR主动寻访 · 入储备人才'],['2026-04-02','高级前端工程师','意向沟通 · 暂不考虑跳槽']]}),
+C({id:'c03',name:'冯雪',scene:'society',source:'往期面试',years:7,edu:'本科 · 武汉大学 · 软件工程',eduTier:2,company:'某电商平台',title:'前端负责人',industries:['互联网/电商'],skills:['React','微前端','性能优化','Node.js','Webpack'],flags:['主导过组件库建设','高并发交易系统经验'],hp:'高潜',hpScene:'社招高潜',lastTouch:'2026-04-15',status:'保温中',strengths:['带过8人前端团队','组件库与监控体系从0到1'],weaknesses:['薪资预期高于预算','近期未跟进'],adapt:['前端负责人','高级前端工程师'],evals:[['高级前端工程师','2026-04-10','终面通过','综合能力优秀，终面通过但因薪资未谈拢，建议长期保温','李总监']],history:[['2026-04-02','高级前端工程师','初筛通过'],['2026-04-10','高级前端工程师','终面通过 · 薪资未达成']]}),
+C({id:'c04',name:'周子墨',scene:'society',source:'往期面试',years:4,edu:'本科 · 华东师范大学 · 软件工程',eduTier:2,company:'某电商平台',title:'前端工程师',industries:['互联网/电商'],skills:['React','TypeScript','Node.js','Webpack'],flags:[],hp:'优质',hpScene:'社招高潜',lastTouch:'2026-06-18',status:'可激活',strengths:['组件库建设经验','工程化扎实'],weaknesses:['高并发交易场景经验不足'],adapt:['前端工程师','高级前端工程师'],evals:[['高级前端工程师','2026-05-12','二面未通过','技术深度尚可，但缺乏交易高并发场景经验，建议一年后再看','王工']],history:[['2026-05-10','高级前端工程师','初筛通过'],['2026-05-12','高级前端工程师','二面未通过']]}),
+C({id:'c05',name:'许诺',scene:'society',source:'往期面试',years:4,edu:'硕士 · 上海交通大学 · 软件工程',eduTier:3,company:'某数据智能公司',title:'前端工程师',industries:['互联网/数据服务'],skills:['React','TypeScript','可视化','ECharts'],flags:[],hp:'优质',hpScene:'社招高潜',lastTouch:'2026-07-08',status:'保温中',strengths:['数据可视化能力突出','代码素养好'],weaknesses:['业务面较窄'],adapt:['前端工程师','可视化开发工程师'],evals:[['高级前端工程师','2026-06-20','面试通过','可视化方向能力突出，面试通过，后因岗位暂停招聘未发offer','王工']],history:[['2026-06-15','高级前端工程师','初筛通过'],['2026-06-20','高级前端工程师','面试通过 · 岗位暂停']]}),
+C({id:'c06',name:'谭雅文',scene:'society',source:'储备人才',years:5,edu:'本科 · 苏州大学 · 软件工程',eduTier:2,company:'某外资软件公司',title:'前端工程师',industries:['企业服务'],skills:['React','TypeScript','单元测试','Node.js'],flags:[],hp:'优质',hpScene:'社招高潜',lastTouch:'2026-06-01',status:'保温中',strengths:['质量意识强','英文文档能力好'],weaknesses:['未接触电商业务'],adapt:['前端工程师','高级前端工程师'],history:[['2026-04-18','高级前端工程师','HR寻访入池'],['2026-06-01','高级前端工程师','保温触达 · 意向观望']]}),
+C({id:'c07',name:'韩志远',scene:'society',source:'过往筛除',years:3,edu:'本科 · 同济大学 · 软件工程',eduTier:2,company:'某SaaS公司',title:'前端工程师',industries:['企业服务'],skills:['Vue','TypeScript','Node.js'],flags:[],hp:'普通',hpScene:'',lastTouch:'',status:'可激活',strengths:['Vue生态熟练'],weaknesses:['技术栈与当前JD偏差'],adapt:['前端工程师'],history:[['2026-05-02','高级前端工程师','初筛未通过 · 技术栈匹配度不足']]}),
+C({id:'c08',name:'郑航',scene:'society',source:'过往筛除',years:2,edu:'本科 · 南京理工大学 · 信息管理',eduTier:2,company:'某物流科技公司',title:'前端开发',industries:['物流'],skills:['JavaScript','Vue','ECharts'],flags:[],hp:'普通',hpScene:'',lastTouch:'',status:'可激活',strengths:['图表可视化经验'],weaknesses:['年限不足'],adapt:['前端开发'],history:[['2026-05-03','高级前端工程师','初筛未通过 · 年限不符']]}),
+C({id:'c09',name:'蒋一帆',scene:'society',source:'过往筛除',years:3,edu:'本科 · 华东理工大学 · 计算机科学与技术',eduTier:2,company:'某在线教育公司',title:'后端工程师',industries:['在线教育'],skills:['Node.js','Koa','MySQL'],flags:[],hp:'普通',hpScene:'',lastTouch:'',status:'可激活',strengths:['Node服务端经验'],weaknesses:['前端工程经验少'],adapt:['全栈工程师'],history:[['2026-05-05','高级前端工程师','初筛未通过 · 岗位方向不符']]}),
+C({id:'c10',name:'卢俊驰',scene:'society',source:'过往筛除',years:2,edu:'本科 · 杭州电子科技大学 · 计算机',eduTier:2,company:'某电商公司',title:'前端开发',industries:['互联网/电商'],skills:['JavaScript','小程序','Vue'],flags:[],hp:'普通',hpScene:'',lastTouch:'',status:'可激活',strengths:['小程序多端经验'],weaknesses:['工程化经验不足'],adapt:['前端开发'],history:[['2026-05-06','高级前端工程师','初筛未通过 · 年限与深度不足']]}),
+C({id:'c11',name:'邵美琪',scene:'society',source:'往期面试',years:3,edu:'硕士 · 中国科学技术大学 · 数据科学',eduTier:3,company:'某内容平台',title:'推荐算法工程师',industries:['互联网/内容社区'],skills:['Python','机器学习','推荐算法','SQL'],flags:['推荐系统','数学'],hp:'高潜',hpScene:'社招高潜',lastTouch:'2026-07-20',status:'保温中',strengths:['召回/排序全链路经验','AB实验体系经验'],weaknesses:['电商场景经验有限'],adapt:['算法工程师-推荐方向'],evals:[['算法工程师-推荐方向','2026-07-15','终面通过','候选人对推荐全链路理解深入，终面通过，因HC被占建议保温','陈博士']],history:[['2026-07-08','算法工程师-推荐方向','初筛通过'],['2026-07-15','算法工程师-推荐方向','终面通过 · HC被占用'],['2026-07-20','算法工程师-推荐方向','转入高潜储备池']]}),
+C({id:'c12',name:'尹晓露',scene:'society',source:'储备人才',years:5,edu:'硕士 · 复旦大学 · 应用数学',eduTier:3,company:'某电商平台',title:'算法专家',industries:['互联网/电商'],skills:['推荐算法','Python','Spark','SQL'],flags:['推荐系统','数学'],hp:'优质',hpScene:'社招高潜',lastTouch:'2026-08-20',status:'保温中',strengths:['数学功底扎实','电商推荐场景资深'],weaknesses:['管理意愿一般'],adapt:['算法工程师-推荐方向','资深算法工程师'],history:[['2026-08-12','算法工程师-推荐方向','HR寻访入池'],['2026-08-20','算法工程师-推荐方向','保温触达 · 年后看机会']]}),
+C({id:'c13',name:'顾北辰',scene:'society',source:'过往筛除',years:4,edu:'硕士 · 中国科学院大学 · 模式识别',eduTier:3,company:'某安防企业',title:'算法工程师',industries:['智能硬件'],skills:['Python','深度学习','SQL'],flags:['数学'],hp:'优质',hpScene:'社招高潜',lastTouch:'2026-06-10',status:'可激活',strengths:['论文产出多'],weaknesses:['无推荐系统落地经验'],adapt:['算法工程师'],history:[['2026-06-05','算法工程师-推荐方向','初筛未通过 · 缺少推荐场景经验']]}),
+C({id:'c14',name:'温子豪',scene:'society',source:'过往筛除',years:1,edu:'本科 · 安徽大学 · 统计学',eduTier:2,company:'某零售公司',title:'数据分析师',industries:['零售'],skills:['Python','SQL'],flags:['数学'],hp:'普通',hpScene:'',lastTouch:'',status:'可激活',strengths:['统计背景'],weaknesses:['年限不足'],adapt:['数据分析师'],history:[['2026-06-22','算法工程师-推荐方向','初筛未通过 · 年限与方向不符']]}),
+C({id:'c15',name:'雷明轩',scene:'society',source:'往期面试',years:2,edu:'本科 · 深圳大学 · 计算机',eduTier:2,company:'某游戏公司',title:'算法工程师',industries:['游戏'],skills:['机器学习','Python','SQL'],flags:[],hp:'普通',hpScene:'',lastTouch:'',status:'可激活',strengths:['工程落地能力尚可'],weaknesses:['算法基础一般'],adapt:['算法工程师'],evals:[['算法工程师-推荐方向','2026-07-02','一面未通过','算法基础一般，工程能力尚可','陈博士']],history:[['2026-06-28','算法工程师-推荐方向','初筛通过'],['2026-07-02','算法工程师-推荐方向','一面未通过']]}),
+C({id:'c16',name:'沈亦舟',scene:'society',source:'往期面试',years:6,edu:'本科 · 上海财经大学 · 信息管理与信息系统',eduTier:2,company:'某零售集团',title:'供应链产品经理',industries:['零售','互联网/电商'],skills:['供应链系统','B端产品','数据分析'],flags:[],hp:'优质',hpScene:'社招高潜',lastTouch:'2026-07-15',status:'保温中',strengths:['WMS/TMS全链路项目经验','业务理解深'],weaknesses:['跨端协作风格偏强势'],adapt:['产品经理-供应链'],evals:[['产品经理-供应链','2026-06-25','终面通过','业务理解深，方案落地能力强，终面通过后候选人选择留守原公司','赵总']],history:[['2026-06-18','产品经理-供应链','初筛通过'],['2026-06-25','产品经理-供应链','终面通过 · 候选人放弃']]}),
+C({id:'c17',name:'秦朗',scene:'society',source:'过往筛除',years:4,edu:'硕士 · 同济大学 · 管理科学与工程',eduTier:3,company:'某物流平台',title:'产品经理',industries:['物流'],skills:['B端产品','数据分析'],flags:[],hp:'普通',hpScene:'',lastTouch:'',status:'可激活',strengths:['数据分析驱动'],weaknesses:['缺供应链系统经验'],adapt:['产品经理'],history:[['2026-08-02','产品经理-供应链','初筛未通过 · 缺供应链领域经验']]}),
+C({id:'c18',name:'孟繁星',scene:'society',source:'储备人才',years:1,edu:'本科 · 复旦大学 · 计算机科学与技术',eduTier:2,company:'某创业公司',title:'前端工程师',industries:['互联网/电商'],skills:['React','TypeScript','JavaScript'],flags:[],hp:'优质',hpScene:'社招高潜',lastTouch:'2026-08-05',status:'可激活',migrateFrom:'2026届校招人才库',gradYear:'2026届',strengths:['校招期综合测评TOP5','成长速度快'],weaknesses:['工程经验尚浅'],adapt:['前端工程师'],history:[['2026-07-31','2026届校招-前端开发','校招周期闭环 · 自动迁入社招人才库'],['2026-08-05','高级前端工程师','迁移后首次保温触达']]}),
+C({id:'c19',name:'潘乐瑶',scene:'society',source:'储备人才',years:1,edu:'硕士 · 同济大学 · 应用统计',eduTier:3,company:'某咨询公司',title:'数据分析师',industries:['咨询'],skills:['SQL','Python','数据分析'],flags:['数学'],hp:'普通',hpScene:'',lastTouch:'',status:'可激活',migrateFrom:'2026届校招人才库',gradYear:'2026届',strengths:['统计建模能力'],weaknesses:['业务经验少'],adapt:['数据分析师'],history:[['2026-07-31','2026届校招-数据分析','校招周期闭环 · 自动迁入社招人才库']]}),
+/* ---- 校招人才库（2027届） ---- */
+C({id:'c20',name:'陈昱彤',scene:'campus',source:'往期面试',years:0,edu:'本科 · 浙江大学 · 计算机科学与技术',eduTier:2,school:'浙江大学',gradYear:'2027届',gpa:'3.7/4.0 · 专业前10%',campus:{project:'校园二手交易平台「拾光」技术负责人 · 3万+用户',award:'ACM校赛二等奖、国家励志奖学金',intern:'字节跳动前端实习6个月（反馈组）'},industries:['互联网/电商'],skills:['React','TypeScript','Node.js','JavaScript'],flags:['实习'],hp:'高潜',hpScene:'校招高潜',lastTouch:'2026-08-25',status:'保温中',strengths:['工程化基础扎实','学习速度快','实习产出获转正评价'],weaknesses:['缺乏大型线上项目复盘经验'],adapt:['2027届校招-前端开发'],evals:[['2027届校招-前端开发','2026-08-12','终面通过','基础扎实，工程化理解超出应届平均水平，沟通清晰，列为重点保温对象','李工']],history:[['2026-08-05','2027届校招-前端开发','初筛通过'],['2026-08-12','2027届校招-前端开发','终面通过 · 等待offer审批'],['2026-08-25','2027届校招-前端开发','保温触达 · 保持意向']]}),
+C({id:'c21',name:'方之遥',scene:'campus',source:'储备人才',years:0,edu:'本科 · 复旦大学 · 软件工程',eduTier:2,school:'复旦大学',gradYear:'2027届',gpa:'3.6/4.0 · 专业前15%',campus:{project:'课程表共享小程序 · 校内2万用户',award:'上海市计算机应用能力大赛一等奖',intern:'B站前端实习3个月'},industries:['互联网/内容社区'],skills:['TypeScript','Vue','JavaScript'],flags:['实习'],hp:'优质',hpScene:'校招高潜',lastTouch:'2026-08-01',status:'保温中',strengths:['小程序全流程经验','作品完成度高'],weaknesses:['React生态需适应'],adapt:['2027届校招-前端开发'],history:[['2026-07-20','2027届校招-前端开发','测评通过 · 入储备池'],['2026-08-01','2027届校招-前端开发','保温触达 · 明确求职意向']]}),
+C({id:'c22',name:'高天佑',scene:'campus',source:'过往筛除',years:0,edu:'硕士 · 上海交通大学 · 计算机',eduTier:3,school:'上海交通大学',gradYear:'2027届',gpa:'3.4/4.0',campus:{project:'实验室科研管理系统',award:'数学建模国赛二等奖',intern:'暂无'},industries:[],skills:['JavaScript','React'],flags:[],hp:'优质',hpScene:'校招高潜',lastTouch:'2026-07-20',status:'可激活',strengths:['算法功底好','学历背景优'],weaknesses:['工程实践偏少'],adapt:['2027届校招-前端开发'],history:[['2026-07-15','2027届校招-前端开发','综合测评靠后 · 暂列备选']]}),
+C({id:'c23',name:'金书妍',scene:'campus',source:'过往筛除',years:0,edu:'本科 · 同济大学 · 软件工程',eduTier:2,school:'同济大学',gradYear:'2027届',gpa:'3.2/4.0',campus:{project:'校园社区前端组件',award:'无',intern:'小公司实习2个月'},industries:[],skills:['Vue','JavaScript'],flags:['实习'],hp:'普通',hpScene:'',lastTouch:'',status:'可激活',strengths:['态度认真'],weaknesses:['技术深度不足'],adapt:['前端开发实习生'],history:[['2026-08-10','2027届校招-前端开发','初筛未通过 · 项目复杂度不足']]}),
+C({id:'c24',name:'何雨桐',scene:'campus',source:'往期面试',years:0,edu:'硕士 · 复旦大学 · 统计学',eduTier:3,school:'复旦大学',gradYear:'2027届',gpa:'3.8/4.0 · 专业前5%',campus:{project:'外卖调度数据分析项目（与企业合作）',award:'全国大学生统计建模大赛一等奖',intern:'美团数据分析实习5个月'},industries:['互联网/本地生活'],skills:['Python','SQL','数据分析','统计学'],flags:['实习','数学'],hp:'高潜',hpScene:'校招高潜',lastTouch:'2026-08-28',status:'保温中',strengths:['统计功底扎实','有真实业务数据项目'],weaknesses:['工程化工具链待补齐'],adapt:['2027届校招-数据分析'],evals:[['2027届校招-数据分析','2026-08-18','终面通过','数据敏感度高，分析框架清晰，可长期保温至offer发放','周经理']],history:[['2026-08-08','2027届校招-数据分析','初筛通过'],['2026-08-18','2027届校招-数据分析','终面通过 · 排队等HC'],['2026-08-28','2027届校招-数据分析','保温触达 · 意向强烈']]}),
+C({id:'c25',name:'罗一诺',scene:'campus',source:'储备人才',years:0,edu:'硕士 · 上海交通大学 · 人工智能',eduTier:3,school:'上海交通大学',gradYear:'2027届',gpa:'3.5/4.0',campus:{project:'校园问答机器人（NLP方向）',award:'AI创新应用大赛华东赛区亚军',intern:'商汤算法实习4个月'},industries:['人工智能'],skills:['Python','机器学习','SQL'],flags:['实习','数学'],hp:'优质',hpScene:'校招高潜',lastTouch:'2026-08-10',status:'保温中',strengths:['AI项目经历对口','科研能力强'],weaknesses:['数据工程经验少'],adapt:['2027届校招-数据分析'],history:[['2026-08-02','2027届校招-数据分析','测评通过 · 入储备池']]}),
+/* ---- 实习人才库 ---- */
+C({id:'c26',name:'白露',scene:'intern',source:'往期面试',years:0,edu:'本科在读 · 华东师范大学 · 软件工程 · 大三',eduTier:2,school:'华东师范大学',gradYear:'2028届',industries:['互联网/电商'],skills:['React','JavaScript','TypeScript'],flags:['实习'],hp:'优质',hpScene:'实习高潜',lastTouch:'2026-08-30',status:'实习中',strengths:['实习期间产出稳定','代码规范好'],weaknesses:['可实习时长有限'],adapt:['AI产品实习生','前端实习生'],evals:[['前端实习生','2026-07-20','实习中','实习期间产出稳定，参与组件库文档建设，表现良好','王工']],history:[['2026-07-01','前端实习生','实习入职'],['2026-08-30','前端实习生','保温触达 · 转正意向沟通']]}),
+C({id:'c27',name:'曹明轩',scene:'intern',source:'往期面试',years:0,edu:'硕士在读 · 复旦大学 · 数据科学 · 研一',eduTier:3,school:'复旦大学',gradYear:'2028届',industries:['互联网/数据服务'],skills:['Python','SQL','Prompt工程'],flags:['数学'],hp:'高潜',hpScene:'实习高潜',lastTouch:'2026-07-05',status:'保温中',strengths:['数据能力突出','AI工具应用熟练'],weaknesses:['产品设计经验少'],adapt:['AI产品实习生'],evals:[['AI产品实习生','2026-06-28','面试通过','对AI产品有较强数据感知，面试通过后选择先完成学业课程','周经理']],history:[['2026-06-20','AI产品实习生','初筛通过'],['2026-06-28','AI产品实习生','面试通过 · 延后入职']]}),
+C({id:'c28',name:'戴安琪',scene:'intern',source:'过往筛除',years:0,edu:'本科在读 · 同济大学 · 设计 · 大三',eduTier:2,school:'同济大学',gradYear:'2028届',industries:[],skills:['Figma','用户研究','产品分析'],flags:[],hp:'普通',hpScene:'',lastTouch:'',status:'可激活',strengths:['原型与交互表达好'],weaknesses:['缺少AI产品认知'],adapt:['产品实习生'],history:[['2026-07-10','AI产品实习生','初筛未通过 · 与岗位要求偏差']]}),
+C({id:'c29',name:'樊星',scene:'intern',source:'储备人才',years:0,edu:'本科在读 · 浙江大学 · 计算机 · 大三',eduTier:2,school:'浙江大学',gradYear:'2028届',industries:['互联网/电商'],skills:['React','TypeScript','Node.js'],flags:['实习'],hp:'优质',hpScene:'实习高潜',lastTouch:'2026-06-20',status:'保温中',strengths:['技术栈与岗位高度吻合'],weaknesses:['面试表达需提升'],adapt:['前端实习生'],history:[['2026-06-10','前端实习生','测评通过 · 入储备池']]}),
+C({id:'c30',name:'费云帆',scene:'intern',source:'过往筛除',years:0,edu:'本科在读 · 上海大学 · 计算机 · 大二',eduTier:2,school:'上海大学',gradYear:'2029届',industries:[],skills:['Java','Spring'],flags:[],hp:'普通',hpScene:'',lastTouch:'',status:'可激活',strengths:['后端基础'],weaknesses:['年级偏低','方向不符'],adapt:['后端实习生'],history:[['2026-07-12','AI产品实习生','初筛未通过 · 技术方向不符']]}),
+/* ---- 新投递 ---- */
+C({id:'c31',name:'石一轩',scene:'society',source:'新投递',years:5,edu:'硕士 · 浙江大学 · 软件工程',eduTier:3,company:'某支付公司',title:'高级前端工程师',industries:['互联网金融'],skills:['React','TypeScript','Node.js','性能优化'],flags:['高并发交易系统经验'],hp:'普通',hpScene:'',lastTouch:'',status:'待初筛',appliedJob:'j-fe',strengths:['支付高并发经验'],weaknesses:['待面试评估'],adapt:['高级前端工程师'],history:[['2026-09-10','高级前端工程师','新投递 · 待初筛']]}),
+C({id:'c32',name:'岳琳',scene:'society',source:'新投递',years:3,edu:'本科 · 苏州大学 · 软件工程',eduTier:2,company:'某旅游平台',title:'前端工程师',industries:['在线旅游'],skills:['React','TypeScript'],flags:[],hp:'普通',hpScene:'',lastTouch:'',status:'待初筛',appliedJob:'j-fe',strengths:['React基础扎实'],weaknesses:['待面试评估'],adapt:['前端工程师'],history:[['2026-09-11','高级前端工程师','新投递 · 待初筛']]}),
+C({id:'c33',name:'齐悦',scene:'society',source:'新投递',years:3,edu:'硕士 · 南京大学 · 人工智能',eduTier:3,company:'某搜索公司',title:'算法工程师',industries:['互联网/搜索'],skills:['Python','机器学习','推荐算法','SQL'],flags:['推荐系统'],hp:'普通',hpScene:'',lastTouch:'',status:'待初筛',appliedJob:'j-algo',strengths:['推荐方向对口'],weaknesses:['待面试评估'],adapt:['算法工程师-推荐方向'],history:[['2026-09-09','算法工程师-推荐方向','新投递 · 待初筛']]}),
+C({id:'c34',name:'阮清野',scene:'intern',source:'新投递',years:0,edu:'本科在读 · 复旦大学 · 计算机 · 大三',eduTier:2,school:'复旦大学',gradYear:'2028届',industries:[],skills:['Prompt工程','用户研究','产品分析'],flags:[],hp:'普通',hpScene:'',lastTouch:'',status:'待初筛',appliedJob:'j-int-ai',strengths:['AI产品认知新'],weaknesses:['待面试评估'],adapt:['AI产品实习生'],history:[['2026-09-11','AI产品实习生','新投递 · 待初筛']]})
+];
+const jobs=[
+{id:'j-fe',title:'高级前端工程师',dept:'交易平台部',scene:'society',status:'重启招聘',postedDays:16,headcount:2,hcText:'2人',
+ jd:{skills:['React','TypeScript','Node.js','性能优化'],yearsRange:[3,6],yearsText:'3-6年',eduText:'本科及以上',industry:'互联网/电商',
+  threshold:[{label:'本科及以上学历',ok:c=>c.eduTier>=2},{label:'3年以上前端经验',ok:c=>c.years>=3}],
+  custom:[{label:'有高并发交易系统经验',weight:8,keys:['高并发'],on:true},{label:'主导过组件库建设',weight:6,keys:['组件库'],on:true}]},
+ originalTags:['React','TypeScript','3-6年','电商行业','性能优化'],
+ review:{applied:86,screened:23,interviewed:6,marketScreen:38,marketInterview:46,
+  commonStrengths:['React生态与工程化普遍熟练','候选人作品集质量整体较高'],
+  commonWeaknesses:['高并发/交易场景经验稀缺','薪资预期普遍高于预算约15%'],
+  quotes:[['王工','2026-08-30','进入二面的候选人代码功底都不错，但真正做过交易大促场景的很少，建议放宽行业、强调可培养性。'],['李总监','2026-09-02','初筛标准偏严，多位可视化/工具方向的候选人被误筛，他们底子完全够。']],
+  suggested:['React','TypeScript','微前端/可视化加分','组件库建设经验','3-6年','电商·金融科技·工具类背景'],
+  dims:null},iterations:[]},
+{id:'j-algo',title:'算法工程师 · 推荐方向',dept:'增长与推荐部',scene:'society',status:'在招',postedDays:21,headcount:1,hcText:'1人',
+ jd:{skills:['Python','推荐算法','机器学习','SQL'],yearsRange:[2,6],yearsText:'2-6年',eduText:'本科及以上',industry:'互联网/电商',
+  threshold:[{label:'本科及以上学历',ok:c=>c.eduTier>=2},{label:'2年以上算法/数据经验',ok:c=>c.years>=2}],
+  custom:[{label:'有大厂推荐系统落地经验',weight:8,keys:['推荐系统'],on:true},{label:'数学/统计背景',weight:5,keys:['数学'],on:true}]},
+ originalTags:['推荐算法','硕士','机器学习','2-6年'],
+ review:{applied:54,screened:9,interviewed:4,marketScreen:24,marketInterview:40,
+  commonStrengths:['工程落地能力普遍达标','SQL/Python基础扎实'],
+  commonWeaknesses:['缺少完整推荐系统闭环经验','候选人行业集中在内容/游戏，电商理解弱'],
+  quotes:[['陈博士','2026-09-01','通过率数据说明硬性“硕士”门槛在挡人，多位数学背景的本科生一面表现其实更好。'],['周经理','2026-08-29','建议在画像里把“数据挖掘/统计建模”纳入核心标签，扩大漏斗上层供给。']],
+  suggested:['Python','推荐/机器学习','SQL','数据挖掘·统计建模加分','2-6年','本科及以上（数学/统计背景优先）'],
+  dims:null},iterations:[]},
+{id:'j-pm',title:'产品经理 · 供应链',dept:'供应链技术部',scene:'society',status:'在招',postedDays:5,headcount:1,hcText:'1人',
+ jd:{skills:['供应链系统','B端产品','数据分析'],yearsRange:[3,8],yearsText:'3-8年',eduText:'本科及以上',industry:'零售',
+  threshold:[{label:'本科及以上学历',ok:c=>c.eduTier>=2},{label:'3年以上产品经验',ok:c=>c.years>=3}],
+  custom:[{label:'有WMS/TMS系统从0到1经验',weight:8,keys:['供应链系统'],on:true}]},
+ originalTags:['供应链','B端产品','3-8年'],review:null,iterations:[]},
+{id:'j-cfe',title:'2027届校招 · 前端开发',dept:'交易平台部',scene:'campus',status:'在招',postedDays:3,headcount:10,hcText:'10人',
+ jd:{skills:['React','TypeScript','Node.js','JavaScript'],yearsRange:[0,0],yearsText:'应届',eduText:'本科及以上',industry:null,
+  threshold:[{label:'2027届应届毕业生',ok:c=>c.gradYear==='2027届'},{label:'本科及以上学历',ok:c=>c.eduTier>=2}],
+  custom:[{label:'有大厂前端实习经历',weight:8,keys:['实习'],on:true}]},
+ originalTags:['React/TypeScript','2027届','本科及以上','计算机相关专业'],
+ review:{applied:38,screened:15,interviewed:5,marketScreen:35,marketInterview:52,
+  commonStrengths:['院校层级整体优秀','实习经历普遍对口'],
+  commonWeaknesses:['工程化深度参差','部分候选人求职地域意向不符'],
+  quotes:[['李工','2026-09-08','浙江大学的候选人质量突出，建议后续宣讲向长三角院校倾斜。']],
+  suggested:['React/TypeScript','2027届','本科及以上','有实习经历者优先','竞赛/项目经历加分'],
+  dims:null},iterations:[]},
+{id:'j-cda',title:'2027届校招 · 数据分析',dept:'数据智能部',scene:'campus',status:'在招',postedDays:15,headcount:4,hcText:'4人',
+ jd:{skills:['SQL','Python','数据分析','统计学'],yearsRange:[0,0],yearsText:'应届',eduText:'本科及以上',industry:null,
+  threshold:[{label:'2027届应届毕业生',ok:c=>c.gradYear==='2027届'},{label:'本科及以上学历',ok:c=>c.eduTier>=2}],
+  custom:[{label:'有数据类实习经历',weight:8,keys:['实习'],on:true},{label:'数学/统计背景',weight:5,keys:['数学'],on:true}]},
+ originalTags:['SQL/Python','统计学相关','2027届','本科及以上'],
+ review:{applied:62,screened:20,interviewed:7,marketScreen:30,marketInterview:33,
+  commonStrengths:['统计与建模基础扎实','竞赛获奖比例高'],
+  commonWeaknesses:['有真实业务数据实习的候选人占比低于市场','SQL工程化能力偏弱'],
+  quotes:[['周经理','2026-09-05','进面的候选人问卷/竞赛背景多，但做过线上业务数据复盘的很少，画像里应强化“业务数据实习”。']],
+  suggested:['SQL/Python扎实','统计学/数学背景','有业务数据实习经历','竞赛·科研项目加分','2027届'],
+  dims:[['院校层级','双一流占比','75%','60%',75,60],['专业成绩','前30%占比','55%','50%',55,50],['实习经历','有数据实习占比','48%','65%',48,65],['校园项目','有完整项目占比','70%','60%',70,60],['综合素质测评','测评均分','82','80',82,80]]},iterations:[]},
+{id:'j-int',title:'AI产品实习生',dept:'AI创新实验室',scene:'intern',status:'在招',postedDays:18,headcount:2,hcText:'2人',
+ jd:{skills:['Prompt工程','用户研究','产品分析','Python'],yearsRange:[0,0],yearsText:'在校生',eduText:'大二至研二在校生',industry:null,
+  threshold:[{label:'在校生（大二至研二）',ok:c=>String(c.edu).includes('在读')}],
+  custom:[{label:'有AI工具深度使用经验',weight:8,keys:['Prompt'],on:true},{label:'数据/统计背景',weight:5,keys:['数学'],on:true}]},
+ originalTags:['AI产品','在校生','用户研究'],
+ review:{applied:40,screened:12,interviewed:5,marketScreen:28,marketInterview:35,
+  commonStrengths:['AI工具应用普遍熟练','学习意愿强'],
+  commonWeaknesses:['产品方法论系统性不足','可实习时长普遍不足6个月'],
+  quotes:[['周经理','2026-09-03','建议明确“一周4天出勤、6个月以上”为硬性项，减少后期流失。']],
+  suggested:['AI产品','在校生（大二-研二）','一周4天·实习6个月以上','用户研究·数据分析能力'],
+  dims:null},iterations:[]}
+];
+/* ================= state ================= */
+const RULE_DAYS={'月度':30,'双月':60,'季度':90};
+const RULES={campus:'月度',society:'双月',intern:'季度'};
+const S={view:'workbench',jobId:'j-fe',reviewJob:null,poolTab:'campus',hpTab:'all',q:'',matchWeights:{skill:45,years:20,edu:15,industry:10},bell:false};
+let SNAP=null;
+/* derived */
+const hpList=()=>candidates.filter(c=>c.hp!=='普通');
+const hpOverdue=c=>{if(c.hp==='普通'||!c.lastTouch)return null;const it=RULE_DAYS[RULES[c.scene]];const d=daysAgo(c.lastTouch);return d>it?{days:d,interval:it}:null};
+const overdueHp=()=>hpList().filter(c=>hpOverdue(c));
+const dueJobs=()=>jobs.filter(j=>j.review&&j.postedDays>=14);
+const pendingMatchCount=()=>jobs.reduce((a,j)=>a+(j.matchResults?j.matchResults.list.length:0),0);
+/* ================= matching engine ================= */
+function scoreOne(job,c){
+  const jd=job.jd,w=S.matchWeights;let s=0;const hit=[];
+  const req=jd.skills;
+  req.forEach(k=>{if(c.skills.includes(k)){s+=w.skill/req.length;hit.push(k)}});
+  const[lo,hi]=jd.yearsRange;
+  if(c.years>=lo&&c.years<=hi)s+=w.years;else if(c.years>=Math.max(0,lo-1)&&lo>0)s+=w.years*.6;else s+=w.years*.25;
+  s+=jd.eduText.includes('在校')?(c.eduTier>=2?w.edu:w.edu*.4):(c.eduTier>=3?w.edu:c.eduTier>=2?w.edu*.8:w.edu*.3);
+  s+=jd.industry?(c.industries.includes(jd.industry)?w.industry:w.industry*.3):w.industry*.7;
+  let prefHit=0;
+  jd.custom.forEach(p=>{if(p.on&&p.keys.some(k=>c.skills.includes(k)||c.flags.includes(k)||(c.campus&&JSON.stringify(c.campus).includes(k)))){s+=p.weight;prefHit++}});
+  const fails=jd.threshold.filter(t=>!t.ok(c)).map(t=>t.label);
+  return{score:Math.min(98,Math.round(s)),hit,fails,prefHit};
+}
+async function runMatch(jobId){
+  const job=byId(jobs,jobId);if(!job)return;
+  const btn=$('#runMatchBtn');if(btn){btn.disabled=true;btn.textContent='AI匹配引擎运行中…'}
+  const panel=$('#enginePanel');if(panel)panel.style.display='block';
+  const steps=[['解析JD核心要求：技能 / 年限 / 学历 / 行业 / 硬性门槛','0'],['场景路由：本次扫描「'+POOL[job.scene]+'」','14'],['扫描存量简历 1,286 份（含往届迁移校招人才）','34'],['多维权重打分 + 个性化偏好加权','62'],['过滤硬性门槛不达标项','81'],['生成 TOP20 待查看匹配清单','100']];
+  for(let i=0;i<steps.length;i++){
+    const rows=$('#engineSteps');if(!rows)return;
+    rows.innerHTML=steps.map((st,j)=>'<div class="estep '+(j<i?'done':j===i?'act':'')+'"><span class="st">'+(j<i?'✓':j+1)+'</span><span>'+esc(st[0])+'</span></div>').join('');
+    const bar=$('#engineBar');if(bar)bar.style.width=steps[i][1]+'%';
+    await sleep(i===2?900:620);
+  }
+  await sleep(400);
+  const poolCands=candidates.filter(c=>c.scene===job.scene&&c.source!=='新投递'&&!(c.appliedJob===job.id));
+  let filtered=0;const scored=[];
+  poolCands.forEach(c=>{const r=scoreOne(job,c);if(r.fails.length){filtered++;return}scored.push(Object.assign({c},r))});
+  scored.sort((a,b)=>b.score-a.score);
+  const list=scored.slice(0,20);
+  const fresh=candidates.filter(c=>c.source==='新投递'&&c.appliedJob===job.id).map(c=>Object.assign({c},scoreOne(job,c))).sort((a,b)=>b.score-a.score);
+  job.matchResults={ts:new Date().toISOString(),list,fresh,filtered,scanned:1286};
+  toast('匹配完成：命中存量候选人 '+scored.length+' 份，TOP20 已归入待查看清单');
+  S.jobId=jobId;render();
+}
+/* ================= shared renderers ================= */
+function sceneChip(sc){return '<span class="chip"><span class="dot d-'+SCENE[sc]+'"></span>'+SCENE[sc]+'</span>'}
+function hpChip(c){return c.hp==='普通'?'':'<span class="chip hp-'+c.hp+'">'+c.hp+'候选'+(c.hpScene?' · '+c.hpScene:'')+'</span>'}
+function srcChip(c){return '<span class="chip src-'+c.source+'">'+c.source+'</span>'}
+function statusChip(c){const m={'保温中':'gold','可激活':'gray','实习中':'acc','待初筛':'vio'};return '<span class="chip '+(m[c.status]||'gray')+'">'+c.status+'</span>'}
+function avatar(c){return '<span class="avt" style="background:'+avColor(c.id)+'">'+esc(c.name[0])+'</span>'}
+function candRow(c,extra){
+  const last=c.lastTouch?('<span class="chip">上次跟进 '+c.lastTouch+'</span>'):'';
+  return '<div class="row" data-cand="'+c.id+'" data-action="openCand" data-id="'+c.id+'">'+avatar(c)+
+  '<div class="mi"><div class="l1"><span class="nm">'+esc(c.name)+'</span>'+hpChip(c)+srcChip(c)+(extra||'')+'</div>'+
+  '<div class="l2">'+esc(c.title||c.edu)+' · '+esc(c.skills.slice(0,4).join(' / '))+'</div></div>'+
+  '<div class="rt" style="display:flex;gap:6px;align-items:center">'+statusChip(c)+last+'</div></div>';
+}
+/* ================= views ================= */
+function renderNav(){
+  const items=[['workbench','工作台',ICON.grid,''],['match','智能JD匹配',ICON.target,pendingMatchCount()?'<span class="nbdg soft">'+pendingMatchCount()+'</span>':''],['review','招聘复盘',ICON.loop,dueJobs().length?'<span class="nbdg">'+dueJobs().length+'</span>':''],['hp','高潜保温',ICON.flame,overdueHp().length?'<span class="nbdg">'+overdueHp().length+'</span>':''],['pool','人才库总览',ICON.db,'']];
+  $('#nav').innerHTML='<div class="cap">模块导航</div>'+items.map(it=>'<button class="nitem '+(S.view===it[0]?'on':'')+'" data-action="nav" data-id="'+it[0]+'">'+it[2]+'<span>'+it[1]+'</span>'+(it[3]||'')+'</button>').join('');
+  const T={workbench:['工作台','存量盘活 · 复盘迭代 · 高潜保温 · 效率升级'],match:['智能JD匹配','新岗位触发AI引擎，自动盘活存量简历'],review:['招聘周期复盘','满14天未闭环岗位自动生成复盘与画像迭代建议'],hp:['高潜人才保温','分层标注 · 三库运营 · 定期触达'],pool:['人才库总览','校招 / 社招 / 实习三大子库与自动流转']}[S.view];
+  $('#pageTitle').innerHTML=esc(T[0])+'<small>'+esc(T[1])+'</small>';
+  const n=overdueHp().length+dueJobs().length,b=$('#bellCount');
+  b.style.display=n?'block':'none';b.textContent=n;
+}
+function vWorkbench(){
+  const due=dueJobs(),od=overdueHp();
+  return '<div class="strip">'+
+  '<div class="stat"><div class="k">存量简历总量</div><div class="v num">1,286<small>份</small></div><div class="s">含过往筛除 · 往期面试 · 储备人才</div><span class="ico">'+ICON.db+'</span></div>'+
+  '<div class="stat"><div class="k">本月激活复用</div><div class="v num">37<small>份</small></div><div class="s">匹配待查看 + 复盘唤醒，替代重新搜寻</div><span class="ico">'+ICON.up+'</span></div>'+
+  '<div class="stat"><div class="k">匹配待查看</div><div class="v num">'+pendingMatchCount()+'<small>人</small></div><div class="s">TOP20 匹配清单待HR跟进</div><span class="ico">'+ICON.target+'</span></div>'+
+  '<div class="stat"><div class="k">高潜人才池</div><div class="v num">'+hpList().length+'<small>人</small></div><div class="s">'+od.length+' 人待保温触达</div><span class="ico">'+ICON.flame+'</span></div>'+
+  '</div>'+
+  '<div class="alerts">'+
+  '<div class="panel"><div class="ph"><span class="t">复盘任务提醒</span><span class="chip gold">满14天自动触发</span><span class="sp"></span><span class="d">'+due.length+' 个在招岗位待复盘</span></div><div class="alist">'+
+  (due.length?due.map(j=>'<div class="arow"><span class="chip"><span class="dot d-'+SCENE[j.scene]+'"></span>'+SCENE[j.scene]+'</span><div class="tx"><div class="l1">'+esc(j.title)+'</div><div class="l2">已发布 '+j.postedDays+' 天 · 投递 '+j.review.applied+' · 面试通过率 '+Math.round(j.review.interviewed/j.review.screened*100)+'%</div></div><button class="abtn" data-action="goReview" data-id="'+j.id+'">去复盘 →</button></div>').join(''):'<div class="empty">暂无待复盘岗位</div>')+
+  '</div></div>'+
+  '<div class="panel"><div class="ph"><span class="t">高潜人才保温角标</span><span class="chip gold">分层推送</span><span class="sp"></span><span class="d">校招月度 · 社招双月 · 实习季度</span></div><div class="alist">'+
+  (od.length?od.slice(0,5).map(c=>{const o=hpOverdue(c);return '<div class="arow"><span class="chip"><span class="dot d-'+SCENE[c.scene]+'"></span>'+SCENE[c.scene]+'</span><div class="tx"><div class="l1">'+esc(c.name)+' · '+c.hp+'候选</div><div class="l2">距上次跟进 '+o.days+' 天，超出'+SCENE[c.scene]+'保温周期（'+o.interval+'天）</div></div><button class="abtn" data-action="goHp" data-id="'+c.id+'">去保温 →</button></div>'}).join(''):'<div class="empty">高潜人才保温状态良好</div>')+
+  (od.length>5?'<div class="arow"><div class="tx"><div class="l2" style="padding:4px 0">还有 '+(od.length-5)+' 位待触达…</div></div><button class="abtn" data-action="goHp">查看全部 →</button></div>':'')+
+  '</div></div></div>'+
+  '<div class="panel" style="margin-top:16px"><div class="ph"><span class="t">最近AI匹配岗位</span><span class="sp"></span><button class="btn sm ghost" data-action="nav" data-id="match">进入智能匹配 →</button></div><div class="alist">'+
+  (jobs.filter(j=>j.matchResults).slice(0,3).map(j=>'<div class="arow"><div class="tx"><div class="l1">'+esc(j.title)+'</div><div class="l2">TOP20 匹配清单已生成 · 命中存量 '+j.matchResults.list.length+' 人 · 新投递 '+j.matchResults.fresh.length+' 人</div></div><button class="abtn" data-action="openJob" data-id="'+j.id+'">查看 →</button></div>').join('')||'<div class="empty">尚未运行匹配，前往「智能JD匹配」触发AI引擎</div>')+
+  '</div></div>';
+}
+/* ---- match ---- */
+function vMatch(){
+  const job=byId(jobs,S.jobId)||jobs[0];S.jobId=job.id;
+  const sceneList=jobs.filter(j=>j.scene===job.scene).length;
+  const w=S.matchWeights;
+  const mr=job.matchResults;
+  return '<div class="mgrid"><div class="panel"><div class="ph"><span class="t">在招岗位</span><span class="sp"></span><button class="btn sm pri" data-action="newJd">＋ 上传新JD</button></div><div class="rows" style="display:block">'+
+  jobs.map(j=>'<div class="jrow '+(j.id===job.id?'on':'')+'" data-action="openJob" data-id="'+j.id+'"><div class="l1">'+sceneChip(j.scene)+'<span>'+esc(j.title)+'</span>'+(j.postedDays>=14&&j.review?'<span class="chip red">待复盘</span>':'')+'</div><div class="l2"><span>'+esc(j.dept)+'</span><span>HC '+j.hcText+'</span><span>发布 '+j.postedDays+' 天</span><span class="chip '+(j.status==='重启招聘'?'gold':'gray')+'" style="margin-left:auto">'+j.status+'</span></div></div>').join('')+
+  '</div><div class="pb" style="border-top:1px solid var(--line2)"><div class="note"><b>触发方式</b>：上传新JD / 编辑岗位重启招聘 / 新增招聘需求时，AI匹配引擎自动启动，无需手动操作。</div></div></div>'+
+  '<div><div class="panel"><div class="ph"><span class="t">'+esc(job.title)+'</span>'+sceneChip(job.scene)+'<span class="chip">JD：'+esc(job.jd.yearsText)+' · '+esc(job.jd.eduText)+(job.jd.industry?' · '+esc(job.jd.industry):'')+'</span><span class="sp"></span><button class="btn pri" id="runMatchBtn" data-action="runMatch" data-id="'+job.id+'">⚡ 触发AI匹配</button></div><div class="pb">'+
+  '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">'+job.jd.skills.map(s=>'<span class="tag hit">'+esc(s)+'</span>').join('')+job.jd.threshold.map(t=>'<span class="chip red">硬门槛：'+esc(t.label)+'</span>').join('')+'</div>'+
+  '<div class="wctl"><label>技能匹配权重</label><input type="range" min="0" max="50" value="'+w.skill+'" data-w="skill"><span class="wv num" id="wv-skill">'+w.skill+'</span></div>'+
+  '<div class="wctl"><label>工作年限权重</label><input type="range" min="0" max="30" value="'+w.years+'" data-w="years"><span class="wv num" id="wv-years">'+w.years+'</span></div>'+
+  '<div class="wctl"><label>学历背景权重</label><input type="range" min="0" max="20" value="'+w.edu+'" data-w="edu"><span class="wv num" id="wv-edu">'+w.edu+'</span></div>'+
+  '<div class="wctl"><label>行业经验权重</label><input type="range" min="0" max="20" value="'+w.industry+'" data-w="industry"><span class="wv num" id="wv-industry">'+w.industry+'</span></div>'+
+  '<div style="font-size:12px;color:var(--mut);margin:4px 0 8px">HR个性化偏好（点击启用/停用，命中加权）：</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+job.jd.custom.map((p,i)=>'<span class="chip click '+(p.on?'on':'off')+'" data-action="togglePref" data-i="'+i+'">'+esc(p.label)+' +'+p.weight+'</span>').join('')+'</div>'+
+  '<div class="engine" id="enginePanel" style="display:'+(mr?'block':'none')+'">'+(mr?engineDone(job):engineIdle())+'</div>'+
+  '</div></div><div id="matchResults">'+(mr?matchResults(job):'')+'</div></div></div>';
+}
+function engineIdle(){return '<div id="engineSteps"><div class="estep"><span class="st">1</span><span>等待触发…</span></div></div><div class="pbar"><i id="engineBar"></i></div>'}
+function engineDone(job){
+  return '<div style="font-size:12.5px;margin-bottom:6px"><b style="color:var(--acc2)">上次匹配：'+esc(job.matchResults.ts.slice(0,10))+'</b> · 扫描 '+fmt(job.matchResults.scanned)+' 份 · 场景路由「'+POOL[job.scene]+'」 · 硬门槛过滤 '+job.matchResults.filtered+' 份</div><div id="engineSteps"><div class="estep done"><span class="st">✓</span><span>匹配已完成，可重新触发</span></div></div><div class="pbar"><i id="engineBar" style="width:100%"></i></div>';
+}
+function matchResults(job){
+  const mr=job.matchResults;
+  const rowItem=(r,i,isTop)=>{const c=r.c;return '<div class="row" data-cand="'+c.id+'" data-action="openCand" data-id="'+c.id+'">'+avatar(c)+
+  '<div class="mi"><div class="l1"><span class="nm">'+esc(c.name)+'</span>'+(isTop&&i<3?'<span class="rank">TOP'+(i+1)+'</span>':'')+hpChip(c)+srcChip(c)+(r.prefHit?'<span class="chip acc">偏好命中×'+r.prefHit+'</span>':'')+(c.migrateFrom?'<span class="chip blue">校招迁移</span>':'')+'</div>'+
+  '<div class="l2">'+esc(c.title||c.school||c.edu)+' · '+(c.years?c.years+'年经验':'应届/在校')+' · 命中：'+(r.hit.length?r.hit.map(esc).join(' / '):'部分基础项')+'</div></div>'+
+  '<div class="rt" style="display:flex;align-items:center;gap:12px"><button class="btn sm" data-action="his">历史操作</button>'+ring(r.score)+'</div></div>'+
+  '<div class="his" style="display:none"><div class="hl"><b>人才库归属</b><span>'+POOL[c.scene]+(c.migrateFrom?'（由'+esc(c.migrateFrom)+'自动迁入）':'')+'</span></div>'+
+  c.history.map(h=>'<div class="hl"><b>'+esc(h[0])+'</b><span>'+esc(h[1])+' · '+esc(h[2])+'</span></div>').join('')+'</div>'};
+  return '<div class="grp-h">存量匹配候选人 <span class="n">TOP'+mr.list.length+' · 已归入岗位专属「待查看匹配候选人」板块</span></div><div class="panel rows">'+
+  (mr.list.length?mr.list.map((r,i)=>rowItem(r,i,true)).join(''):'<div class="empty">「'+POOL[job.scene]+'」暂无达标存量简历</div>')+'</div>'+
+  '<div class="grp-h">本岗位新投递候选人 <span class="n">与存量区分，差异化跟进</span></div><div class="panel rows">'+
+  (mr.fresh.length?mr.fresh.map(r=>rowItem(r,99,false)).join(''):'<div class="empty">暂无新投递</div>')+'</div>';
+}
+/* ---- review ---- */
+function vReview(){
+  const due=dueJobs(),job=S.reviewJob?byId(jobs,S.reviewJob):null;
+  let out='<div class="panel"><div class="ph"><span class="t">自动复盘任务</span><span class="chip gold">发布满14天且未闭环 → 自动触发</span><span class="sp"></span><span class="d">'+due.length+' 个岗位待复盘</span></div><div style="display:block">'+
+  due.map(j=>{const r=j.review,sr=Math.round(r.screened/r.applied*100),ir=Math.round(r.interviewed/Math.max(1,r.screened)*100);return '<div class="duecard '+(S.reviewJob===j.id?'on':'')+'" data-action="openReview" data-id="'+j.id+'">'+sceneChip(j.scene)+
+  '<div class="tx" style="flex:1"><div class="l1" style="font-weight:600">'+esc(j.title)+(j.iterations.length?'<span class="chip acc" style="margin-left:6px">已迭代'+j.iterations.length+'轮</span>':'')+'</div><div class="l2" style="font-size:11.5px;color:var(--mut)">投递 '+r.applied+' · 初筛通过率 '+sr+'%（市场基线 '+r.marketScreen+'%） · 面试通过率 '+ir+'%（基线 '+r.marketInterview+'%）</div></div>'+
+  '<button class="btn sm pri">查看复盘报告</button></div>'}).join('')+
+  '</div></div>';
+  if(!job)return out+'<div class="panel" style="margin-top:16px"><div class="empty">点击上方岗位，查看AI复盘报告与画像迭代建议<br><span style="font-size:11.5px">复盘闭环：招聘 → 数据复盘 → 优化画像 → 精准招聘</span></div></div>';
+  const r=job.review,sr=Math.round(r.screened/r.applied*100),ir=Math.round(r.interviewed/Math.max(1,r.screened)*100);
+  out+='<div style="margin-top:16px"><div class="panel"><div class="ph"><button class="btn sm ghost" data-action="backReview">← 返回</button><span class="t">'+esc(job.title)+'</span>'+sceneChip(job.scene)+'<span class="chip">复盘周期：近'+job.postedDays+'天</span><span class="sp"></span>'+(job.iterations.length?'<span class="chip acc">画像已迭代 '+job.iterations.length+' 轮</span>':'')+'</div><div class="pb">'+
+  '<div class="funnel"><div class="fseg"><div class="k">投递总量</div><div class="v num">'+r.applied+'</div><div class="r flat">含存量激活 '+(job.matchResults?job.matchResults.list.length:0)+' 人</div></div>'+
+  '<div class="fseg"><div class="k">初筛通过</div><div class="v num">'+r.screened+'</div><div class="r '+(sr>=r.marketScreen?'up':'down')+'">'+sr+'% vs 基线'+r.marketScreen+'% '+(!job.matchResults?'':'')+'</div></div>'+
+  '<div class="fseg"><div class="k">面试通过</div><div class="v num">'+r.interviewed+'</div><div class="r '+(ir>=r.marketInterview?'up':'down')+'">'+ir+'% vs 基线'+r.marketInterview+'%</div></div></div>'+
+  '<div class="twocol" style="margin-top:16px"><div>'+
+  '<div class="diffbox" style="margin-bottom:14px"><div class="cap">面试官统一面评摘录</div>'+r.quotes.map(q=>'<div class="bquote" style="margin-bottom:6px"><b>'+esc(q[0])+'</b> <span style="color:var(--faint);font-size:11px">'+esc(q[1])+'</span><br>'+esc(q[2])+'</div>').join('')+'</div>'+
+  '<div class="diffbox"><div class="cap">候选人共性优势</div><div style="margin-bottom:8px">'+r.commonStrengths.map(s=>'<span class="tag add">'+esc(s)+'</span>').join('')+'</div><div class="cap">共性短板</div><div>'+r.commonWeaknesses.map(s=>'<span class="tag del">'+esc(s)+'</span>').join('')+'</div></div>'+
+  '</div><div>';
+  if(r.dims){out+='<div class="diffbox" style="margin-bottom:14px"><div class="cap">应届生专属复盘维度 <span style="color:var(--gold)">（校招岗位专属）</span></div>'+r.dims.map(d=>'<div class="bar"><div class="bl"><b>'+esc(d[0])+' · '+esc(d[1])+'</b><span class="mk">本校 '+d[2]+' ｜ 市场 '+d[3]+'</span></div><div class="tr"><i style="width:'+d[4]+'%"></i><em style="left:'+d[5]+'%"></em></div></div>').join('')+'</div>'}
+  out+='<div class="diffbox"><div class="cap">原定JD画像 vs AI建议画像</div><div style="margin-bottom:6px"><span style="font-size:11px;color:var(--faint)">当前生效：</span><div style="margin-top:4px">'+job.originalTags.map(t=>'<span class="tag">'+esc(t)+'</span>').join('')+'</div></div>'+
+  '<div><span style="font-size:11px;color:var(--faint)">AI建议：</span><div style="margin-top:4px">'+r.suggested.map(t=>{const add=!job.originalTags.includes(t);return '<span class="tag '+(add?'add':'')+'">'+(add?'+ ':'')+esc(t)+'</span>'}).join('')+'</div></div>'+
+  '<div style="display:flex;gap:8px;margin-top:12px"><button class="btn sm pri" data-action="adoptTags" data-id="'+job.id+'">采纳AI优化</button><button class="btn sm" data-action="editTags" data-id="'+job.id+'">人工修正画像</button></div></div>'+
+  '</div></div>';
+  if(job.iterations.length){out+='<div style="margin-top:16px"><div class="cap" style="font-size:11px;color:var(--faint);letter-spacing:1px;margin-bottom:4px">画像迭代记录</div><div class="timeline">'+job.iterations.slice().reverse().map(it=>'<div class="tli"><span class="td num">'+it.date+'</span><b>'+it.type+'</b> · '+esc(it.note)+'<div style="margin-top:3px">'+it.tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join('')+'</div></div>').join('')+'</div></div>'}
+  return out+'</div></div></div>';
+}
+/* ---- hp ---- */
+function vHp(){
+  const tabs=[['all','总池',hpList().length],['campus','校招高潜',hpList().filter(c=>c.scene==='campus').length],['society','社招高潜',hpList().filter(c=>c.scene==='society').length],['intern','实习高潜',hpList().filter(c=>c.scene==='intern').length]];
+  let list=S.hpTab==='all'?hpList():hpList().filter(c=>c.scene===S.hpTab);
+  list=list.slice().sort((a,b)=>(hpOverdue(b)?hpOverdue(b).days:0)-(hpOverdue(a)?hpOverdue(a).days:0));
+  return '<div class="panel" style="margin-bottom:16px"><div class="ph"><span class="t">保温推送规则</span><span class="chip gold">校招周期内加密触达</span><span class="sp"></span></div><div class="pb" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">'+
+  ['campus','society','intern'].map(sc=>'<div class="diffbox"><div class="cap">'+SCENE[sc]+'高潜候选人</div><div style="display:flex;align-items:center;gap:8px"><select data-action="setRule" data-scene="'+sc+'" style="flex:1;border:1px solid var(--line);border-radius:8px;padding:6px 8px">'+Object.keys(RULE_DAYS).map(k=>'<option '+(RULES[sc]===k?'selected':'')+'>'+k+'</option>').join('')+'</select><span style="font-size:12px;color:var(--mut)">推送周期</span></div><div style="font-size:11.5px;color:var(--faint);margin-top:6px">'+(sc==='campus'?'校招周期内重点保温，保障应届留存':'系统主页生成保温角标，提醒分层跟进')+'</div></div>').join('')+
+  '</div></div>'+
+  '<div class="filters" style="margin-bottom:12px">'+tabs.map(t=>'<span class="chip click '+(S.hpTab===t[0]?'on':'')+'" data-action="hpTab" data-id="'+t[0]+'">'+t[1]+' · '+t[2]+'</span>').join('')+'</div>'+
+  '<div class="panel rows" id="hpList">'+(list.length?list.map(c=>{const o=hpOverdue(c);return candRow(c,(o?'<span class="chip red">待保温 · 超'+(o.days-o.interval)+'天</span>':'')+'<span class="chip">适配：'+esc((c.adapt[0]||'—'))+'</span>')+
+  '<div class="his" style="display:block"><div class="hl"><b>最新面评</b><span>'+(c.evals.length?esc(c.evals[0][3])+' —— '+esc(c.evals[0][4]):'暂无面评记录')+'</span></div>'+
+  '<div class="hl"><b>人才库归属</b><span>'+POOL[c.scene]+(c.migrateFrom?'（'+esc(c.migrateFrom)+'迁入）':'')+'</span>　<b style="min-width:auto">状态</b><span>'+c.status+'</span>　<b style="min-width:auto">上次跟进</b><span>'+(c.lastTouch||'—')+'</span></div></div>'}).join(''):'<div class="empty">该场景下暂无高潜候选人</div>')+'</div>';
+}
+/* ---- pool ---- */
+function vPool(){
+  const cnt=sc=>candidates.filter(c=>c.scene===sc).length;
+  const hpc=sc=>candidates.filter(c=>c.scene===sc&&c.hp!=='普通').length;
+  let list=candidates;
+  if(S.poolTab!=='all')list=list.filter(c=>c.scene===S.poolTab);
+  if(S.q)list=list.filter(c=>(c.name+c.skills.join()+c.title+c.school+(c.company||'')).toLowerCase().includes(S.q.toLowerCase()));
+  return '<div class="poolgrid" style="margin-bottom:16px">'+
+  ['campus','society','intern'].map(sc=>'<div class="poolc"><div class="pn"><span class="dot d-'+SCENE[sc]+'" style="width:8px;height:8px;border-radius:50%"></span>'+POOL[sc]+'</div><div class="pv num">'+cnt(sc)+'<small> 人 · 高潜 '+hpc(sc)+'</small></div><div class="pd">'+({campus:'当期2027届 · 周期至2027-07-31自动闭环',society:'含往届校招迁移人才 · 全模块复用',intern:'在校生 · 按实习周期运营'}[sc])+'</div><span class="glyph">'+SCENE[sc][0]+'</span></div>').join('')+'</div>'+
+  '<div class="panel" style="margin-bottom:16px"><div class="ph"><span class="t">校招周期自动流转机制</span><span class="chip gold">次年7月31日闭环 · 全自动迁移</span><span class="sp"></span><button class="btn sm" data-action="migrateDemo" data-id="demo">▶ 模拟迁移演示</button><button class="btn sm danger" data-action="restoreDemo" id="restoreBtn" style="'+(SNAP?'':'display:none')+'">恢复演示数据</button></div><div class="pb">'+
+  '<div class="cycle"><span class="node" style="left:2%"></span><span class="nl" style="left:2%">2026-09-01 周期开启（2027届）</span><span class="node future" style="left:88%"></span><span class="nl" style="left:88%;color:var(--gold)">2027-07-31 自动闭环 → 迁入社招库</span></div>'+
+  '<div class="note" style="margin-top:30px">当年校招候选人统一归集至当期校招人才库，仅参与校招场景的智能匹配 / 复盘 / 保温；周期结束系统批量迁移至社招通用人才库，自动更新标签与库归属，此后可参与社招全模块能力。参考：2026届候选人已于 2026-07-31 自动迁移。</div></div></div>'+
+  '<div class="panel"><div class="ph"><span class="t">候选人总览</span><span class="sp"></span><div class="filters"><span class="chip click '+(S.poolTab==='all'?'on':'')+'" data-action="poolTab" data-id="all">全部 '+candidates.length+'</span>'+['campus','society','intern'].map(sc=>'<span class="chip click '+(S.poolTab===sc?'on':'')+'" data-action="poolTab" data-id="'+sc+'">'+SCENE[sc]+' '+cnt(sc)+'</span>').join('')+'<input class="srch" id="poolSearch" placeholder="搜索姓名 / 技能 / 公司 / 院校…" value="'+esc(S.q)+'"></div></div>'+
+  '<div class="rows" id="poolList">'+(list.length?list.map(c=>candRow(c,(c.migrateFrom?'<span class="chip blue">'+esc(c.migrateFrom)+'迁入</span>':''))).join(''):'<div class="empty">未找到匹配候选人</div>')+'</div></div>';
+}
+/* ================= bio card & modal ================= */
+let bioTimer=null,bioCand=null,bioPos={x:0,y:0};
+function bioHTML(c){
+  const last=c.evals[0];
+  return '<div class="bh"><span class="avt" style="background:'+avColor(c.id)+';width:38px;height:38px;font-size:14px">'+esc(c.name[0])+'</span><div style="flex:1"><div class="bname">'+esc(c.name)+'　'+(c.hp!=='普通'?'<span class="chip hp-'+c.hp+'" style="vertical-align:2px">'+c.hp+'候选</span>':'')+'</div><div class="bsub">'+esc(c.title||c.school||'')+' · '+POOL[c.scene]+(c.migrateFrom?'（'+esc(c.migrateFrom)+'迁入）':'')+' · '+c.source+'</div></div></div>'+
+  '<div class="bsec"><div class="bc">基础履历</div><div class="bv">'+esc(c.edu)+(c.years?' · '+c.years+'年经验':' · 应届/在校')+(c.company?' · 现职 '+esc(c.company):'')+'</div>'+(c.campus?'<div class="bv" style="color:var(--mut);font-size:12px;margin-top:2px">校园：'+esc(c.campus.project)+'｜实习：'+esc(c.campus.intern)+'</div>':'')+'</div>'+
+  (last?'<div class="bsec"><div class="bc">最新面试评价（'+esc(last[0])+' · '+esc(last[1])+' · '+esc(last[2])+'）</div><div class="bquote">'+esc(last[3])+'</div></div>':'')+
+  '<div class="bsec"><div class="bc">能力优势 / 短板</div><div class="bv">'+c.strengths.map(s=>'<span class="tag add">'+esc(s)+'</span>').join('')+c.weaknesses.map(s=>'<span class="tag del">'+esc(s)+'</span>').join('')+'</div></div>'+
+  '<div class="bsec"><div class="bc">适配岗位 · 历史应聘 '+c.history.length+' 次</div><div class="bv">'+c.adapt.map(a=>'<span class="tag hit">'+esc(a)+'</span>').join('')+'</div></div>'+
+  (c.bioExtra?'<div class="bsec"><div class="bc">HR补充备注</div><div class="bv" style="background:var(--goldbg);border-radius:8px;padding:6px 10px">'+esc(c.bioExtra)+'</div></div>':'')+
+  '<div class="bfoot"><span>悬浮小传 · 点击行查看完整档案</span><button class="btn sm" data-action="editBio" data-id="'+c.id+'">✎ 补充备注</button></div>';
+}
+function showBio(c){bioCand=c;const card=$('#bioCard');card.innerHTML=bioHTML(c);card.classList.add('show');placeBio()}
+function placeBio(){if(!bioCand)return;const card=$('#bioCard');const w=372,h=card.offsetHeight||300;let x=bioPos.x+20,y=bioPos.y+16;if(x+w>innerWidth-12)x=bioPos.x-w-16;if(y+h>innerHeight-12)y=Math.max(10,innerHeight-h-12);card.style.left=x+'px';card.style.top=y+'px'}
+function hideBio(){bioCand=null;$('#bioCard').classList.remove('show')}
+function openModal(html){$('#modalRoot').innerHTML='<div class="overlay" data-action="closeModal"></div><div class="modal">'+html+'</div>';$('#modalRoot').classList.add('show')}
+function closeModal(){hideBio();$('#modalRoot').classList.remove('show');$('#modalRoot').innerHTML=''}
+function candDetail(c){
+  return '<div class="mh"><span class="avt" style="background:'+avColor(c.id)+';width:34px;height:34px">'+esc(c.name[0])+'</span><div><div class="t">'+esc(c.name)+'　'+(c.hp!=='普通'?'<span class="chip hp-'+c.hp+'">'+c.hp+'候选 · '+esc(c.hpScene)+'</span>':'<span class="chip gray">普通候选</span>')+'</div><div style="font-size:11.5px;color:var(--mut)">'+POOL[c.scene]+' · '+c.source+(c.migrateFrom?' · 由'+esc(c.migrateFrom)+'自动迁入':'')+'</div></div><span class="sp"></span><button class="mx" data-action="closeModal">✕</button></div><div class="mb">'+
+  '<div class="msec"><div class="cap">基础履历</div><div class="kv"><span class="k">学历背景</span><span>'+esc(c.edu)+'</span><span class="k">工作年限</span><span>'+(c.years?c.years+' 年':'应届 / 在校')+'</span>'+(c.company?'<span class="k">现职</span><span>'+esc(c.company)+' · '+esc(c.title)+'</span>':'')+'<span class="k">当前状态</span><span>'+c.status+'</span><span class="k">适配岗位</span><span>'+c.adapt.map(a=>'<span class="tag hit">'+esc(a)+'</span>').join('')+'</span></div></div>'+
+  (c.campus?'<div class="msec"><div class="cap">校园信息（校招重点）</div><div class="kv"><span class="k">院校 / 届别</span><span>'+esc(c.school)+' · '+esc(c.gradYear)+' · GPA '+esc(c.gpa)+'</span><span class="k">校园项目</span><span>'+esc(c.campus.project)+'</span><span class="k">获奖情况</span><span>'+esc(c.campus.award)+'</span><span class="k">实习经历</span><span>'+esc(c.campus.intern)+'</span></div></div>':'')+
+  '<div class="msec"><div class="cap">核心能力</div><div>'+c.skills.map(s=>'<span class="tag hit">'+esc(s)+'</span>').join('')+(c.flags.length?c.flags.map(f=>'<span class="tag">'+esc(f)+'</span>').join(''):'')+'</div><div style="margin-top:8px">'+c.strengths.map(s=>'<span class="tag add">'+esc(s)+'</span>').join('')+c.weaknesses.map(s=>'<span class="tag del">'+esc(s)+'</span>').join('')+'</div></div>'+
+  '<div class="msec"><div class="cap">面试评价记录</div>'+(c.evals.length?c.evals.map(e=>'<div class="evrow"><b>'+esc(e[0])+'</b> <span class="chip '+(e[2].includes('通过')&&!e[2].includes('未')?'grn':'red')+'" style="margin-left:4px">'+esc(e[2])+'</span><div class="eq">'+esc(e[3])+'</div><div class="em">'+esc(e[1])+' · 面试官 '+esc(e[4])+'</div></div>').join(''):'<div class="empty" style="padding:10px">暂无面评记录</div>')+'</div>'+
+  '<div class="msec"><div class="cap">历史应聘 / 操作记录与库归属</div><div class="timeline">'+c.history.slice().reverse().map(h=>'<div class="tli"><span class="td num">'+esc(h[0])+'</span><b>'+esc(h[1])+'</b> · '+esc(h[2])+'</div>').join('')+'<div class="tli"><span class="td num">当前</span>归属 '+POOL[c.scene]+'（高潜：'+c.hp+'）</div></div></div>'+
+  '<div class="msec"><div class="cap">HR备注（人才小传）</div><div style="font-size:13px;background:var(--sf2);border:1px solid var(--line2);border-radius:9px;padding:10px 12px;min-height:38px">'+(c.bioExtra?esc(c.bioExtra):'<span style="color:var(--faint)">暂无补充，可记录面试细节、沟通重点、个性化特质…</span>')+'</div></div>'+
+  '<div style="display:flex;gap:10px"><button class="btn pri" data-action="editBio" data-id="'+c.id+'">✎ 编辑小传备注</button>'+(c.hp!=='普通'?'<button class="btn" data-action="touchHp" data-id="'+c.id+'">记录保温回访</button>':'')+'<button class="btn" data-action="closeModal">关闭</button></div></div>';
+}
+/* ================= actions ================= */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-action]');
+  if(!e.target.closest('#bellPanel')&&!e.target.closest('[data-action="bell"]')){const bp=$('#bellPanel');if(bp)bp.classList.remove('show')}
+  if(!t)return;
+  const a=t.dataset.action,id=t.dataset.id;
+  if(a!=='his'&&a!=='openCand')hideBio();
+  switch(a){
+    case 'nav':S.view=id;S.reviewJob=null;render();break;
+    case 'openJob':S.view='match';S.jobId=id;render();break;
+    case 'runMatch':runMatch(id);break;
+    case 'togglePref':{const j=byId(jobs,S.jobId);if(j){j.jd.custom[+t.dataset.i].on=!j.jd.custom[+t.dataset.i].on;render()}break}
+    case 'his':{const his=t.closest('.row').nextElementSibling;if(his&&his.classList.contains('his')){his.style.display=his.style.display==='none'?'block':'none'}e.stopPropagation();break}
+    case 'openCand':{const c=byId(candidates,id);if(c){hideBio();openModal(candDetail(c))}break}
+    case 'closeModal':closeModal();break;
+    case 'goReview':S.view='review';S.reviewJob=id;render();break;
+    case 'openReview':S.reviewJob=id;render();break;
+    case 'backReview':S.reviewJob=null;render();break;
+    case 'adoptTags':{const j=byId(jobs,id);if(j){j.originalTags=j.review.suggested.slice();j.iterations.push({date:todayStr(),type:'AI优化',note:'采纳AI复盘建议，自动更新岗位核心需求标签',tags:j.originalTags.slice()});toast('已采纳AI画像优化，迭代记录已留存');render()}break}
+    case 'editTags':{const j=byId(jobs,id);if(j)openTagEditor(j);break}
+    case 'goHp':S.view='hp';S.hpTab=id&&candidates.some(c=>c.id===id)?byId(candidates,id).scene:'all';render();break;
+    case 'hpTab':S.hpTab=id;render();break;
+    case 'poolTab':S.poolTab=id;render();break;
+    case 'touchHp':{const c=byId(candidates,id);if(c){c.lastTouch=todayStr();c.history.push([todayStr(),c.adapt[0]||c.title||'保温','HR保温回访']);toast('已记录对 '+c.name+' 的保温回访');render()}break}
+    case 'editBio':{const c=byId(candidates,id);if(c)openBioEditor(c);break}
+    case 'saveBio':{const c=byId(candidates,t.dataset.id);if(c){c.bioExtra=$('#bioText').value.trim();toast('小传备注已更新');closeModal();render()}break}
+    case 'bell':toggleBell();break;
+    case 'newJd':toast('演示环境：请在左侧选择岗位编辑触发，或理解为已上传新JD并自动触发匹配',true);break;
+    case 'migrateDemo':doMigrate();break;
+    case 'restoreDemo':doRestore();break;
+  }
+});
+document.addEventListener('mouseover',e=>{
+  const row=e.target.closest('[data-cand]');
+  if(row){const c=byId(candidates,row.dataset.cand);if(c){bioPos={x:e.clientX,y:e.clientY};clearTimeout(bioTimer);bioTimer=setTimeout(()=>showBio(c),140)}}
+  else if(!e.target.closest('#bioCard')){clearTimeout(bioTimer);if(bioCand&&!e.target.closest('#bioCard'))hideBio()}
+});
+document.addEventListener('mousemove',e=>{if(bioCand){bioPos={x:e.clientX,y:e.clientY};placeBio()}});
+document.addEventListener('input',e=>{
+  const w=e.target.closest('[data-w]');
+  if(w){S.matchWeights[w.dataset.w]=+w.value;const lab=$('#wv-'+w.dataset.w);if(lab)lab.textContent=w.value;return}
+  if(e.target.id==='poolSearch'){S.q=e.target.value;const el=$('#poolList');if(el){renderPoolList()}}
+});
+document.addEventListener('change',e=>{
+  const sel=e.target.closest('[data-action="setRule"]');
+  if(sel){RULES[sel.dataset.scene]=sel.value;toast(SCENE[sel.dataset.scene]+'高潜保温周期已设为「'+sel.value+'」')}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();$('#bellPanel').classList.remove('show')}});
+function renderPoolList(){
+  let list=candidates;if(S.poolTab!=='all')list=list.filter(c=>c.scene===S.poolTab);
+  if(S.q)list=list.filter(c=>(c.name+c.skills.join()+c.title+c.school+(c.company||'')).toLowerCase().includes(S.q.toLowerCase()));
+  $('#poolList').innerHTML=list.length?list.map(c=>candRow(c,c.migrateFrom?'<span class="chip blue">'+esc(c.migrateFrom)+'迁入</span>':'')).join(''):'<div class="empty">未找到匹配候选人</div>';
+}
+/* tag editor */
+let TAGS=[];
+function openTagEditor(job){
+  TAGS=job.originalTags.slice();
+  openModal('<div class="mh"><span class="t">人工修正岗位画像 · '+esc(job.title)+'</span><span class="sp"></span><button class="mx" data-action="closeModal">✕</button></div><div class="mb">'+
+  '<div class="note" style="margin-bottom:14px">点击标签移除；回车添加新标签。修正后原迭代记录保留，可追溯。</div>'+
+  '<div id="tagChips" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">'+TAGS.map((t,i)=>'<span class="chip click on" data-action="delTag" data-i="'+i+'">'+esc(t)+' ✕</span>').join('')+'</div>'+
+  '<input id="tagIn" placeholder="输入新标签后回车…" style="width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 12px">'+
+  '<div style="display:flex;gap:10px;margin-top:16px"><button class="btn pri" data-action="saveTags" data-id="'+job.id+'">保存修正</button><button class="btn" data-action="closeModal">取消</button></div></div>');
+  $('#tagIn').addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.value.trim()){TAGS.push(ev.target.value.trim());ev.target.value='';refreshTagChips()}});
+}
+function refreshTagChips(){const el=$('#tagChips');if(el)el.innerHTML=TAGS.map((t,i)=>'<span class="chip click on" data-action="delTag" data-i="'+i+'">'+esc(t)+' ✕</span>').join('')}
+function openBioEditor(c){
+  openModal('<div class="mh"><span class="t">编辑人才小传 · '+esc(c.name)+'</span><span class="sp"></span><button class="mx" data-action="closeModal">✕</button></div><div class="mb">'+
+  '<div class="note" style="margin-bottom:12px">补充面试细节、沟通重点、个性化特质等，信息将同步展示在悬浮小传与档案中。</div>'+
+  '<textarea id="bioText" style="width:100%;min-height:110px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical">'+esc(c.bioExtra)+'</textarea>'+
+  '<div style="display:flex;gap:10px;margin-top:14px"><button class="btn pri" data-action="saveBio" data-id="'+c.id+'">保存</button><button class="btn" data-action="closeModal">取消</button></div></div>');
+  setTimeout(()=>{const ta=$('#bioText');if(ta)ta.focus()},50);
+}
+document.addEventListener('click',e=>{
+  const d=e.target.closest('[data-action="delTag"]');
+  if(d){TAGS.splice(+d.dataset.i,1);refreshTagChips()}
+  const s=e.target.closest('[data-action="saveTags"]');
+  if(s){const j=byId(jobs,s.dataset.id);if(j){j.originalTags=TAGS.slice();j.iterations.push({date:todayStr(),type:'人工修正',note:'HR人工二次修正画像（AI建议保留备查）',tags:TAGS.slice()});toast('画像已人工修正并留存迭代记录');closeModal();render()}}
+});
+/* bell */
+function toggleBell(){
+  const p=$('#bellPanel');
+  if(p.classList.contains('show')){p.classList.remove('show');return}
+  const due=dueJobs(),od=overdueHp();
+  p.innerHTML='<div style="padding:12px 16px;border-bottom:1px solid var(--line2);font-weight:700;font-size:13px">提醒中心</div>'+
+  (due.length?due.map(j=>'<div class="arow" style="display:flex;gap:10px;padding:10px 16px;border-top:1px solid var(--line2);cursor:pointer" data-action="goReview" data-id="'+j.id+'"><span class="chip gold">复盘</span><div style="flex:1"><div style="font-size:12.5px;font-weight:600">'+esc(j.title)+'</div><div style="font-size:11px;color:var(--mut)">已发布 '+j.postedDays+' 天，自动复盘已生成</div></div></div>').join(''):'')+
+  (od.length?od.slice(0,6).map(c=>{const o=hpOverdue(c);return '<div class="arow" style="display:flex;gap:10px;padding:10px 16px;border-top:1px solid var(--line2);cursor:pointer" data-action="goHp" data-id="'+c.id+'"><span class="chip"><span class="dot d-'+SCENE[c.scene]+'"></span>'+SCENE[c.scene]+'</span><div style="flex:1"><div style="font-size:12.5px;font-weight:600">'+esc(c.name)+' · '+c.hp+'候选</div><div style="font-size:11px;color:var(--mut)">超保温周期 '+(o.days-o.interval)+' 天，建议回访</div></div></div>'}).join(''):'')+
+  (!due.length&&!od.length?'<div class="empty">暂无待处理提醒</div>':'');
+  p.classList.add('show');
+}
+/* migrate */
+function doMigrate(){
+  const campus=candidates.filter(c=>c.scene==='campus');
+  if(!campus.length){toast('校招人才库已迁移完毕',true);return}
+  if(!SNAP)SNAP=JSON.stringify(candidates);
+  campus.forEach(c=>{c.scene='society';c.pool='社招人才库';c.migrateFrom='2027届校招人才库';if(c.hp!=='普通')c.hpScene='社招高潜';c.history.push([todayStr(),'校招周期自动闭环','2027届周期结束，批量自动迁入社招人才库'])});
+  const rb=$('#restoreBtn');if(rb)rb.style.display='';
+  toast('校招周期闭环：'+campus.length+' 名候选人已自动迁入社招人才库，标签与归属已同步更新');
+  render();
+  setTimeout(()=>{document.querySelectorAll('.poolc')[1]&&document.querySelectorAll('.poolc')[1].classList.add('migrate-flash')},60);
+}
+function doRestore(){
+  if(!SNAP)return;
+  const restored=JSON.parse(SNAP);restored.forEach((c,i)=>Object.assign(candidates[i],c));
+  SNAP=null;toast('已恢复演示数据');render();
+}
+/* ================= boot ================= */
+function render(){renderNav();const v={workbench:vWorkbench,match:vMatch,review:vReview,hp:vHp,pool:vPool}[S.view];$('#viewRoot').innerHTML=v();window.scrollTo(0,0)}
+render();
+</script>
+</body>
+</html>
